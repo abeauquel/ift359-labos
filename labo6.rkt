@@ -53,3 +53,29 @@
            (somme-matrice i j))
 )
 (somme-matrice-premiers 1 3)
+
+(display "Exercice 5 permutation\n")
+;Exercice 5 permutation
+(define (permutation L)
+  (if (null? L)
+      (list null)
+      (flat-map (lambda (x)
+                  (map (lambda(p) (cons x p));rajouter x à 
+                       (permutations (oter x L)))); toutes les permutations sans l'élément
+                L)))
+
+(define (oter x L)
+   (filter (lambda (a) (not(= a x))) L)
+)
+
+(permutations '(1 2 3 ))
+(display "Exercice 6 Arbre n-aire\n")
+
+;Exercice 6 Arbre n-aire
+(define (creer-arbre-n etiq L-fils)
+  
+)
+
+(define (creer-arbre-vide-n)
+  '()
+)
