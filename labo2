@@ -1,0 +1,116 @@
+#lang racket
+
+(define list '(a b c a e f g))
+(define list2 '(a b (c d) e f g))
+(define list3 '(a 1 (b 2) ((c 3)) 4))
+;Labo 2
+;exercices 3
+(define (dernier Lettres) 
+     (if(pair? (cdr Lettres))
+        (dernier (cdr Lettres))
+       (car Lettres)
+       )
+ 
+)
+
+;(dernier list)
+
+;exercices 4
+(define (list-plate Lettres) 
+     (if(null? Lettres)
+        #t
+       (if(list? (car Lettres))
+         #f
+         (list-plate (cdr Lettres)) 
+       )
+     )
+ 
+)
+;(list-plate list)
+;(list-plate list2)
+
+;exercices 5
+(define (nombre-occurrences a Lettres)
+       (if(null? Lettres)
+          0
+       (if(equal? a (car Lettres))
+         (+ 1 (nombre-occurrences a (cdr Lettres)))
+         (nombre-occurrences a (cdr Lettres))
+       )
+     )
+)
+
+;(nombre-occurrences 'b list)
+
+;exercices 6
+(define (aplatir L)
+     (if (null? L)
+         '()
+     (if(list? (car L))
+        (append (aplatir (car L)) (aplatir(cdr L)))
+        (cons (car L) (aplatir(cdr L)))
+     )
+))
+
+(aplatir list2)
+
+;exercices 7
+(define (somme L)
+     (if (null? L)
+       0
+       (if(list? (car L))
+          (+ (somme (car L)) (somme (cdr L)))
+          (if(number? (car L))
+             (+ (car L) (somme (cdr L)))
+             (somme (cdr L))
+             )
+          )
+      )
+)
+
+
+;(somme '(1 2 3))
+;(somme '(1 2 3 (1 2 3)))
+;(somme list3)
+
+
+;exercices 8
+(define (nombre-occurrences* a L)
+     (if(null? L)
+          0
+       (if(list? (car L))
+          (nombre-occurrences* a (car L))
+          (if(equal? a (car L))
+             (+ 1 (nombre-occurrences* a (cdr L)))
+             (nombre-occurrences* a (cdr L))
+         )
+       )
+        
+     )
+  )
+
+(nombre-occurrences* 'g (append list list list))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
