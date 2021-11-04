@@ -1,0 +1,179 @@
+#lang racket
+
+; appel du déboggeur trace
+(require racket/trace)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;  LABORATOIRE 4 - IFT359
+;;;
+;;;     Implantation des arbres binaires
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  Structure de données
+;;;        Arbres binaires
+;;;
+;;;       Implantation des constructeurs
+;;;            des sélecteurs et des prédicats
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;      CONSTRUCTEURS des arbres binaires
+;;;
+;;; Un arbre binaire est composé
+;;;  d'une étiquette, d'un fils gauche et d'un fils droit 
+;;; Un fils est soit un arbre, une feuille ou un arbre vide
+
+(define (creer-arbre-b etiq fils-g fils-d)
+  (list etiq fils-g fils-d))
+
+; l'arbre vide est la liste vide
+(define (creer-arbre-vide-b)
+  '())
+
+; une feuille est un atome
+(define (creer-feuille-b etiq)
+  etiq)
+
+;;;
+;;;      PRÉDICATS des arbres binaires
+;;;
+;;; Les prédicats vérifient si un arbre est vide
+;;;   ou s'il est une feuille
+;;;
+(define (arbre-vide-b? a)
+  (null? a))
+
+(define (feuille-arbre-b? a)
+  (not (list? a)))
+
+;;;
+;;;      SÉLECTEURS des arbres binaires
+;;;
+;;; L'étiquette est le premier élément de la liste qui compose l'arbre,
+;;;       Le fils gauche le deuxième élément, et le fils droit le troisième.
+;;; si l'arbre est vide ou égale à une feuille on renvoit l'arbre
+;;;
+(define (etiquette-arbre-b a)
+  (if (or (arbre-vide-b? a)(feuille-arbre-b? a))
+      a
+      (car a)))
+
+(define (fils-g-arbre-b a)
+(if (or (arbre-vide-b? a)(feuille-arbre-b? a))
+      a
+      (cadr a)))
+
+(define (fils-d-arbre-b a)
+(if (or (arbre-vide-b? a)(feuille-arbre-b? a))
+      a
+      (caddr a)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  Structure de données
+;;;        Arbres binaires
+;;;
+;;;       Opérateurs
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;  Exercice 2
+;;; fonction pre-ordre parcourt l'arbre en préordre
+;;; c'est à dire en listant d'abord l'étiquette
+;;;     puis le contenu du fils gauche parcouru en pré ordre
+;;;       et le contenu du fils droit parcouru en pré ordre
+;;; cette fonction est récursive à processus récursif
+(define (pre-ordre-b a)
+  (if (or (arbre-vide-b? a)(feuille-arbre-b? a))
+      (list a)
+      (cons (etiquette-arbre-b a)
+            (append (pre-ordre-b (fils-g-arbre-b a))
+                    (pre-ordre-b (fils-d-arbre-b a)))))) 
+
+;;;  Exercice 3
+;;; fonction nombre de feuilles qui parcourt l'arbre en préordre
+;;; et en additionnant à chaque fois qu'il tombe sur une feuille
+;;;     
+;;; cette fonction est récursive à processus récursif
+(define (nombre-feuilles-b a)
+  (cond [(arbre-vide-b? a) 0]
+        [(feuille-arbre-b? a) 1]
+        [else (+ (nombre-feuilles-b (fils-g-arbre-b a))
+                 (nombre-feuilles-b (fils-d-arbre-b a)))]))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  
+;;;        Expressions arithmétiques binaires
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  Exercice 6
+;;;  calcule l'expression mathématique de l'arbre A
+(define (calcul-exp a)
+  (cond [(arbre-vide-b? a) 0]
+        [(feuille-arbre-b? a) a]
+        [(equal? (etiquette-arbre-b a) 'plus) (+ (calcul-exp (fils-g-arbre-b a))
+                                                 (calcul-exp (fils-d-arbre-b a)))]
+        [(equal? (etiquette-arbre-b a) 'mul) (* (calcul-exp (fils-g-arbre-b a))
+                                                 (calcul-exp (fils-d-arbre-b a)))]
+        [(equal? (etiquette-arbre-b a) 'div) (/ (calcul-exp (fils-g-arbre-b a))
+                                                 (calcul-exp (fils-d-arbre-b a)))]
+        [else "expression non valide"]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  Exercice 7
+;;; calcule l'expression mathématique de l'arbre A
+;;; à qui on applique la fonction f à chacune de ses feuilles
+(define (calcul-exp-f f a)
+  (cond [(arbre-vide-b? a) (f 0)]
+        [(feuille-arbre-b? a) (f a)]
+        [(equal? (etiquette-arbre-b a) 'plus) (+ (calcul-exp-f f (fils-g-arbre-b a) )
+                                                 (calcul-exp-f f (fils-d-arbre-b a)))]
+        [(equal? (etiquette-arbre-b a) 'mul) (* (calcul-exp-f f (fils-g-arbre-b a))
+                                                 (calcul-exp-f f (fils-d-arbre-b a)))]
+        [(equal? (etiquette-arbre-b a) 'div) (/ (calcul-exp-f f (fils-g-arbre-b a))
+                                                 (calcul-exp-f f (fils-d-arbre-b a)))]
+        [else "expression non valide"]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  
+;;;        Arbres binaires
+;;;
+;;;       Exemple
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(displayln "testexercice 2 et 3")
+(define A1 (creer-arbre-b 'a (creer-arbre-b 'g (creer-feuille-b 1) (creer-feuille-b 10))
+                             (creer-arbre-b 'd (creer-feuille-b 2) (creer-arbre-vide-b))))
+A1
+(pre-ordre-b A1)
+
+(nombre-feuilles-b A1)
+
+(displayln "exercice 4   - Arbre binaire A2")
+(define A2 (creer-arbre-b 'plus (creer-arbre-b 'mul (creer-feuille-b 10) (creer-feuille-b 2))
+                             (creer-arbre-b 'plus (creer-feuille-b 1)
+                                                  (creer-arbre-b 'div (creer-feuille-b 12)
+                                                                      (creer-feuille-b 3)))))
+A2
+(pre-ordre-b A2)
+
+(displayln "exercice 5   - Évaluation de l'Arbre binaire A2")
+(calcul-exp A2)
+
+
+(displayln "exercice 6   - Évaluation de l'Arbre binaire A2 à qui l'on applique une translation de -2")
+(calcul-exp-f (lambda(i) (+ i -2)) A2)
+
+(displayln "exercice 6   - Évaluation de l'Arbre binaire A2 à qui l'on élève chaque feuille au carré")
+(calcul-exp-f (lambda(i) (* i i)) A2)
+
+(displayln "exercice 6   - Évaluation de l'Arbre binaire vide à qui l'on opère une translation de 4")
+(calcul-exp-f (lambda(i) (+ i 4)) (creer-arbre-vide-b))
