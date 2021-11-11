@@ -1,0 +1,51 @@
+#lang racket
+(require racket/promise)
+;(provide flot->liste)
+(provide gen-signal)
+;(provide quantification)
+;(provide passage-par-zero)
+
+; ***************** IFT359 / TP4 Groupe 1
+; ***************** Beauquel, Alexandre 19 034 135
+; ***************** Poulin, Sebastien 19 093 892
+
+(define-syntax cons-flot
+(syntax-rules ()
+((cons-flot a b) (cons a (delay b)))))
+
+(define (car-flot f)
+(car f))
+
+(define (cdr-flot f)
+(force (cdr f)))
+
+(define (flot-null)
+'())
+
+(define (flot-null? flot)
+(null? flot))
+
+;Affichage des n valeurs d'un flot 
+(define (flot->liste n flot)
+   (if (= n 0)
+       '()
+       (cons (car-flot flot) (flot->liste (- n 1) (cdr-flot flot))))
+   )
+
+;flot infini du signalsignal de la sinusoïde déterminée
+;par la fonction: F(x) = a*sin(b* t + c)
+(define (gen-signal a b dt c)
+ (cons-flot (* a (sin (* b (+ dt c))))
+            (gen-signal a b dt (+ c 1))
+            )
+)
+
+;test simple flot
+(define (flot-infini-de i)
+  (cons-flot i (flot-infini-de i))
+ )
+
+
+(displayln (flot->liste 10 (flot-infini-de 5)))
+(letrec ([ampl 1])
+(displayln (flot->liste 10 (gen-signal ampl 1 0.5 0))))
